@@ -1,0 +1,117 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healing (free version)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            height: 100vh;
+            background-color: #f0f8ff;
+        }
+        h1 {
+            font-size: 2.5em;
+            color: #333;
+        }
+        p {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            color: #555;
+        }
+        .button-container {
+            display: flex;
+            gap: 20px;
+        }
+        button {
+            font-size: 1em;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .enabled {
+            background-color: #4caf50;
+            color: white;
+        }
+        .enabled:hover {
+            background-color: #45a049;
+        }
+        .disabled {
+            background-color: #ccc;
+            color: #666;
+            cursor: not-allowed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .disabled span {
+            margin-left: 10px;
+        }
+        video {
+            display: none;
+            width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div id="start-screen">
+        <h1>Healing (free version)</h1>
+        <p>Choose what you want to heal today</p>
+        <div class="button-container">
+            <button class="enabled" onclick="playVideo('heartbreak.mp4')">Heartbreak</button>
+            <button class="enabled" onclick="playVideo('restlessness.mp4')">Restlessness</button>
+            <button class="disabled" disabled>
+                Conflict <span>🔒</span>
+            </button>
+        </div>
+    </div>
+    <video id="video-player" controls></video>
+
+    <script>
+        const startScreen = document.getElementById('start-screen');
+        const videoPlayer = document.getElementById('video-player');
+
+        function playVideo(videoFile) {
+            // Hide the start screen
+            startScreen.style.display = 'none';
+
+            // Set video source and make it visible
+            videoPlayer.src = videoFile;
+            videoPlayer.style.display = 'block';
+
+            // Request full screen and play the video
+            videoPlayer.play();
+            videoPlayer.requestFullscreen().catch((err) => {
+                console.warn("Full screen not available:", err.message);
+            });
+
+            // Return to start screen when video ends
+            videoPlayer.onended = function () {
+                document.exitFullscreen().catch(() => {
+                    // Handle cases where exiting full screen is not supported
+                });
+                resetLayout();
+            };
+        }
+
+        function resetLayout() {
+            // Reset video element styles
+            videoPlayer.style.display = 'none';
+            videoPlayer.src = ''; // Clear video source
+
+            // Reset start screen styles
+            startScreen.style.display = 'flex';
+            startScreen.style.flexDirection = 'column';
+            startScreen.style.justifyContent = 'center';
+            startScreen.style.alignItems = 'center';
+        }
+    </script>
+</body>
+</html>

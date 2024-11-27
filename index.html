@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -20,12 +20,12 @@
         }
         h1 {
             font-size: 2.5em;
-            color: #333;
+            color: white; /* Adjusted to remain visible */
         }
         p {
             font-size: 1.2em;
             margin-bottom: 20px;
-            color: #555;
+            color: white; /* Adjusted to remain visible */
         }
         .button-container {
             display: flex;
@@ -58,8 +58,16 @@
         }
         video {
             display: none;
-            width: 100%;
-            height: auto;
+            width: 100vw; /* Full screen width */
+            height: 100vh; /* Full screen height */
+            object-fit: cover; /* Scales the video proportionally */
+            background: black;
+        }
+        video::-webkit-media-controls,
+        video::-moz-media-controls,
+        video::-ms-media-controls,
+        video::-media-controls {
+            display: none !important; /* Completely hide video controls */
         }
     </style>
 </head>
@@ -75,7 +83,7 @@
             </button>
         </div>
     </div>
-    <video id="video-player" controls></video>
+    <video id="video-player" autoplay playsinline></video>
 
     <script>
         const startScreen = document.getElementById('start-screen');
@@ -89,17 +97,25 @@
             videoPlayer.src = videoFile;
             videoPlayer.style.display = 'block';
 
-            // Request full screen and play the video
+            // Play the video in fullscreen
             videoPlayer.play();
-            videoPlayer.requestFullscreen().catch((err) => {
-                console.warn("Full screen not available:", err.message);
-            });
+            if (videoPlayer.requestFullscreen) {
+                videoPlayer.requestFullscreen().catch((err) => {
+                    console.warn("Fullscreen request failed:", err.message);
+                });
+            } else if (videoPlayer.webkitEnterFullscreen) {
+                videoPlayer.webkitEnterFullscreen();
+            }
 
             // Return to start screen when video ends
             videoPlayer.onended = function () {
-                document.exitFullscreen().catch(() => {
-                    // Handle cases where exiting full screen is not supported
-                });
+                if (document.fullscreenElement || document.webkitFullscreenElement) {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen().catch(() => {});
+                    } else if (document.webkitExitFullscreen) {
+                        document.webkitExitFullscreen();
+                    }
+                }
                 resetLayout();
             };
         }
